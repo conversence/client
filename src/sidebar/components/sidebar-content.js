@@ -48,8 +48,13 @@ function SidebarContentController(
 
     self.rootThread = thread();
     self.selectedTab = state.selectedTab;
-
+    
     var counts = tabs.counts(state.annotations);
+    // how to we calc counts and still run this when the state is in init?
+    if (state.selectedTabIsInitState && counts.notes > 0 && counts.annotations == 0) {
+      annotationUI.selectTab("note");
+    }
+
 
     Object.assign(self, {
       totalNotes: counts.notes,

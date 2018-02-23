@@ -80,6 +80,7 @@ function init(settings) {
     filterQuery: settings.query || null,
 
     selectedTab: TAB_DEFAULT,
+    selectedTabIsInitState: true,
 
     // Key by which annotations are currently sorted.
     sortKey: TAB_SORTKEY_DEFAULT[TAB_DEFAULT],
@@ -126,6 +127,7 @@ var update = {
       return {};
     }
     return {
+      selectedTabIsInitState: false,
       selectedTab: action.tab,
       sortKey: TAB_SORTKEY_DEFAULT[action.tab],
       sortKeysAvailable: TAB_SORTKEYS_AVAILABLE[action.tab],
