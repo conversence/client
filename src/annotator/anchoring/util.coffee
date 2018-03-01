@@ -112,12 +112,28 @@ Util.xpathFromNode = (el, relativeRoot) ->
   result
 
 Util.nodeFromXPath = (xp, root) ->
-  steps = xp.substring(1).split("/")
+  # first look for a "//el[@id='']" fragment
   node = root
-  for step in steps
-    [name, idx] = step.split "["
-    idx = if idx? then parseInt (idx?.split "]")[0] else 1
-    node = findChild node, name.toLowerCase(), idx
+  fragmentArray = xp.match /^\/\/(\w+)\[@id=['"]([^\]]+)['"]\]\/?(.*)/
+  if fragmentArray
+    node = root.ownerDocument.getElementById fragmentArray[2]
+    if Array.isArray node
+      node = node[0]
+    if node and (fragmentArray[1] == '*' or
+        node.tagName.toLowerCase() == fragmentArray[1].toLowerCase())
+      xp = "/" + fragmentArray[3]
+    else
+      node = root
+  xp = xp.substring(1)
+  if xp
+    steps = xp.split("/")
+    for step in steps
+      [name, idx] = step.split "["
+      if idx
+        idx = parseInt (idx?.split "]")[0]
+        node = findChild node, name.toLowerCase(), idx
+      else
+        node = findChild node, name.toLowerCase(), 1
 
   node
 

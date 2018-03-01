@@ -66,8 +66,10 @@ Range.sniff = (r) ->
 Range.nodeFromXPath = (xpath, root=document) ->
   doc = if root instanceof Document then root else root.ownerDocument
   evaluateXPath = (xp, nsResolver=null) ->
+    if not xp
+      return root
     try
-      doc.evaluate('.' + xp, root, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
+      doc.evaluate(xp, root, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
     catch exception
       # There are cases when the evaluation fails, because the
       # HTML documents contains nodes with invalid names,
