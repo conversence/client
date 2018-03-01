@@ -29,6 +29,10 @@ simpleXPathJQuery = (relativeRoot) ->
 
     while elem?.nodeType == Node.ELEMENT_NODE and elem isnt relativeRoot
       tagName = elem.tagName.replace(":", "\\:")
+      if elem.id
+        # TODO Check uniqueness.
+        tagName = elem.tagName.toLowerCase()
+        return "//#{tagName}[@id='#{elem.id}']#{path}"
       idx = $(elem.parentNode).children(tagName).index(elem) + 1
 
       idx  = "[#{idx}]"
@@ -45,8 +49,11 @@ simpleXPathPure = (relativeRoot) ->
 
   getPathSegment = (node) ->
     name = getNodeName node
+    if node.id
+      # TODO Check uniqueness.
+      return "//#{name}[@id='#{node.id}']"
     pos = getNodePosition node
-    "#{name}[#{pos}]"
+    "/#{name}[#{pos}]"
 
   rootNode = relativeRoot
 
@@ -55,10 +62,10 @@ simpleXPathPure = (relativeRoot) ->
     while node != rootNode
       unless node?
         throw new Error "Called getPathTo on a node which was not a descendant of @rootNode. " + rootNode
-      xpath = (getPathSegment node) + '/' + xpath
+      xpath = (getPathSegment node) + xpath
+      if xpath.charAt(1) == '/'
+        break
       node = node.parentNode
-    xpath = '/' + xpath
-    xpath = xpath.replace /\/$/, ''
     xpath
 
   jq = this.map ->
