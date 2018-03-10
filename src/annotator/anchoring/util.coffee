@@ -21,7 +21,7 @@
 
 $ = require('jquery')
 
-{ simpleXPathJQuery, simpleXPathPure } = require('./xpath')
+{ simpleXPathJQuery, simpleXPathPure, findChild } = require('./xpath')
 
 Util = {}
 
