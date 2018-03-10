@@ -103,4 +103,5 @@ getNodePosition = (node) ->
 module.exports = {
   simpleXPathJQuery,
   simpleXPathPure,
+  findChild,
 }
