@@ -64,9 +64,10 @@ Range.sniff = (r) ->
 #
 # Returns the Node if found otherwise null.
 Range.nodeFromXPath = (xpath, root=document) ->
+  doc = if root instanceof Document then root else root.ownerDocument
   evaluateXPath = (xp, nsResolver=null) ->
     try
-      document.evaluate('.' + xp, root, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
+      doc.evaluate('.' + xp, root, nsResolver, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue
     catch exception
       # There are cases when the evaluation fails, because the
       # HTML documents contains nodes with invalid names,
@@ -83,18 +84,13 @@ Range.nodeFromXPath = (xpath, root=document) ->
       # should work for the simple expressions we generate.
       Util.nodeFromXPath(xp, root)
 
-  if not $.isXMLDoc document.documentElement
+  if not $.isXMLDoc doc.documentElement
     evaluateXPath xpath
   else
     # We're in an XML document, create a namespace resolver function to try
     # and resolve any namespaces in the current document.
     # https://developer.mozilla.org/en/DOM/document.createNSResolver
-    customResolver = document.createNSResolver(
-      if document.ownerDocument == null
-        document.documentElement
-      else
-        document.ownerDocument.documentElement
-    )
+    customResolver = doc.createNSResolver(doc)
     node = evaluateXPath xpath, customResolver
 
     unless node
@@ -109,13 +105,13 @@ Range.nodeFromXPath = (xpath, root=document) ->
       ).join('/')
 
       # Find the default document namespace.
-      namespace = document.lookupNamespaceURI null
+      namespace = doc.lookupNamespaceURI null
 
       # Try and resolve the namespace, first seeing if it is an xhtml node
       # otherwise check the head attributes.
       customResolver  = (ns) ->
         if ns == 'xhtml' then namespace
-        else document.documentElement.getAttribute('xmlns:' + ns)
+        else doc.documentElement.getAttribute('xmlns:' + ns)
 
       node = evaluateXPath xpath, customResolver
     node
